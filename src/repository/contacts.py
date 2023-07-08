@@ -75,3 +75,4 @@ async def get_birthdays(days: int, db: Session):
         else:
             continue
     return contacts_with_birthdays
+return contacts_with_birthdays
