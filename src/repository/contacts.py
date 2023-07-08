@@ -6,7 +6,7 @@ from src.database.models import Contact, User
 from src.schemas import ContactModel
 
 
-async def create_contact(body: ContactModel, db: Session):
+async def create_contact(user: User, body: ContactModel, db: Session):
     contact = Contact(**body.dict(), user_id=user.id)
     db.add(contact)
     db.commit()
@@ -26,7 +26,7 @@ async def update_contact(user: User, contact_id: int, body: ContactModel, db: Se
     return contact
 
 
-async def remove_contact(contact_id: int, db: Session):
+async def remove_contact(user: User, contact_id: int, db: Session):
     contact = db.query(Contact).filter(and_(Contact.id == contact_id, Contact.user_id == user.id)).first()
     if contact:
         db.delete(contact)
@@ -34,7 +34,7 @@ async def remove_contact(contact_id: int, db: Session):
     return contact
 
 
-async def search_contact(keyword: str, db: Session):
+async def search_contact(user: User, keyword: str, db: Session):
     contacts = db.query(Contact).filter(and_(Contact.user_id == user.id,
                                              (Contact.first_name.ilike(f"%{keyword}%")) |
                                              (Contact.last_name.ilike(f"%{keyword}%")) |
@@ -43,27 +43,27 @@ async def search_contact(keyword: str, db: Session):
     return contacts
 
 
-async def get_contacts(db: Session):
+async def get_contacts(user: User, db: Session):
     contacts = db.query(Contact).filter(and_(Contact.user_id == user.id)).all()
     return contacts
 
 
-async def get_contact_by_id(contact_id: int, db: Session):
+async def get_contact_by_id(user: User, contact_id: int, db: Session):
     contact = db.query(Contact).filter(and_(Contact.id == contact_id, Contact.user_id == user.id)).first()
     return contact
 
 
-async def get_contact_by_email(email: str, db: Session):
+async def get_contact_by_email(user: User, email: str, db: Session):
     contact = db.query(Contact).filter(and_(Contact.user_id == user.id, email == email)).first()
     return contact
 
 
-async def get_contact_by_phone(phone_number: str, db: Session):
+async def get_contact_by_phone(user: User, phone_number: str, db: Session):
     contact = db.query(Contact).filter(and_(Contact.user_id == user.id, phone_number == phone_number)).first()
     return contact
 
 
-async def get_birthdays(days: int, db: Session):
+async def get_birthdays(user: User, days: int, db: Session):
     contacts_with_birthdays = []
     today = date.today()
     current_year = today.year
@@ -75,4 +75,3 @@ async def get_birthdays(days: int, db: Session):
         else:
             continue
     return contacts_with_birthdays
-
